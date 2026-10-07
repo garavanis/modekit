@@ -15,7 +15,7 @@ from tap tests (EMA) or from output-only records (OMA).
 
 Built on [JAX](https://github.com/jax-ml/jax) and
 [Equinox](https://github.com/patrick-kidger/equinox). Importing `modekit`
-switches JAX to 64-bit precision, which the identification needs.
+switches JAX to 64-bit precision.
 
 ## Install
 
