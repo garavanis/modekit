@@ -96,7 +96,7 @@ uv run pytest
 
 ## References
 
-Many parts of modekit were inspired by pyOMA2:
+Many parts of `modekit` were inspired by pyOMA2:
 
 - Pasca, D. P., Margoni, D. F. (2025). pyOMA2: A Python module for conducting
   operational modal analysis. *Journal of Open Source Software*, 10(115), 7656.
@@ -104,9 +104,20 @@ Many parts of modekit were inspired by pyOMA2:
 
 Methods and practice:
 
+- Peeters, B., Van der Auweraer, H., Guillaume, P., Leuridan, J. (2004). The
+  PolyMAX frequency-domain method: a new standard for modal parameter
+  estimation? *Shock and Vibration*, 11(3–4), 395–409.
 - Peeters, B., Van der Auweraer, H. (2005). PolyMAX: a revolution in
   operational modal analysis. *Proceedings of the 1st International Operational
   Modal Analysis Conference (IOMAC)*, Copenhagen.
+- Ester, M., Kriegel, H.-P., Sander, J., Xu, X. (1996). A density-based
+  algorithm for discovering clusters in large spatial databases with noise.
+  *Proceedings of the 2nd International Conference on Knowledge Discovery and
+  Data Mining (KDD-96)*, 226–231. AAAI Press.
+- Shin, K., Hammond, J. K. (2008). *Fundamentals of Signal Processing for
+  Sound and Vibration Engineers*. Wiley.
+- Farrar, C. R., Worden, K. (2013). *Structural Health Monitoring: A Machine
+  Learning Perspective*, Appendix A: Signal Processing for SHM. Wiley.
 - Avitabile, P. (2018). *Modal Testing: A Practitioner's Guide*. Wiley.
 
 ## License
