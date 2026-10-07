@@ -47,7 +47,8 @@ freqs, H = ema.get_frf(method="H1")                       # FRFs, (Q, 1, N)
 # one pLSCF per band, at a fake sampling rate about 2.5x the band's upper edge;
 # the bands' modes combined; then one LSFD residue fit over 2-560 Hz
 bands = [(2, 120, 300.0), (120, 320, 800.0), (320, 560, 1400.0)]
-fit, band_data = full_band_mpe([(freqs, H)], None, fs, bands, spectrum="frf_tap",
+alpha = None                                              # decay rate of the exponential window, if one was applied
+fit, band_data = full_band_mpe([(freqs, H)], alpha, fs, bands, spectrum="frf_tap",
                                quantity="acceleration", refs="global")
 lsfd, model = fit
 model.Fn, model.Zeta                                      # natural frequencies [Hz], damping ratios
@@ -59,14 +60,9 @@ for flo, fhi, est, poles, res in band_data[0]:
 lsfd.synthesis_plot(model, H, xlim=lsfd.band)
 ```
 
-The third argument of `full_band_mpe` is the decay rate of an exponential
-window on the responses (`None`: no window). Output-only data goes the same
-way: `OmaModel(y, fs, fft_args={"n_lags": 4096}, estimator="cor")`, its half
-spectra from `get_output_spectra(ref_dofs=[0])`, and
-`full_band_mpe(..., oma.window_rate, fs, bands, spectrum="sd_cor")`. With
-several reference passes, `refs="local"` re-estimates the participation
-factors on the combined spectra. The example notebook walks through both,
-with the windows, the data checks and the clustering settings.
+For output-only data the steps are the same, with `OmaModel` in place of
+`EmaModel`, its half spectra in place of the FRFs, and `spectrum="sd_cor"`.
+The example notebook goes through both cases in full.
 
 ## Example
 
