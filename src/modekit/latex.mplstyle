@@ -1,0 +1,7 @@
+# modekit's figure style: LaTeX text in Computer Modern Sans Serif. A notebook
+# applies it with
+#     plt.style.use("modekit.latex")
+# It needs a LaTeX installation (text.usetex).
+text.usetex     : True
+font.family     : sans-serif
+font.sans-serif : Computer Modern Sans Serif
