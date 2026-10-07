@@ -154,7 +154,9 @@ def test_output_spectra_feed_plscf(oma_model):
     est = pLSCF(freqs, fs=FS, ordmax=16, spectrum="sd_per")
     poles = est.fit(S)
 
-    Lambd, _, _, _ = poles.mpe(F_TRUE, order_in=11, rtol=0.05, on_missing="raise")
+    # the lowest order at which both modes are stable; a fixed order near the top of
+    # the chart loses the 90 Hz pole on some platforms
+    Lambd, _, _, _ = poles.mpe(F_TRUE, rtol=0.05, on_missing="raise")
     Fn = lambd_to_fn(Lambd)
     assert np.allclose(Fn, F_TRUE, rtol=2e-2), Fn
 
@@ -252,7 +254,7 @@ def test_lsfd_on_full_spectra_fits_the_mirrored_modes(oma_model):
     """
     freqs, S = oma_model.get_output_spectra()
     est = pLSCF(freqs, fs=FS, ordmax=16, spectrum="sd_per")
-    Lambd, _, Lr, _ = est.fit(S).mpe(F_TRUE, order_in=11, rtol=0.05)
+    Lambd, _, Lr, _ = est.fit(S).mpe(F_TRUE, rtol=0.05)  # lowest order with both modes stable
 
     lsfd = LSFD(freqs, fs=FS, spectrum="sd_per", band=(10, 200))
     model = lsfd.fit(S, Lambd, part_factors=Lr)
