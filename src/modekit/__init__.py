@@ -1,5 +1,5 @@
 """modekit: modal analysis in JAX — natural frequencies, damping ratios and mode
-shapes from tap tests or ambient vibrations.
+shapes from hammer or shaker tests, or from ambient vibrations.
 
 The main names are available here (``import modekit as mk``); the modules hold
 the rest.
