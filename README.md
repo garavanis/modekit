@@ -114,6 +114,9 @@ Methods and practice:
   algorithm for discovering clusters in large spatial databases with noise.
   *Proceedings of the 2nd International Conference on Knowledge Discovery and
   Data Mining (KDD-96)*, 226–231. AAAI Press.
+- Boroschek, R. L., Bilbao, J. A. (2019). Interpretation of stabilization
+  diagrams using density-based clustering algorithm. *Engineering Structures*,
+  178, 245–257. https://doi.org/10.1016/j.engstruct.2018.09.091
 - Shin, K., Hammond, J. K. (2008). *Fundamentals of Signal Processing for
   Sound and Vibration Engineers*. Wiley.
 - Farrar, C. R., Worden, K. (2013). *Structural Health Monitoring: A Machine
