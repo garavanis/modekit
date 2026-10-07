@@ -1,7 +1,8 @@
 # modekit
 
-Modal analysis in JAX: modal parameters (natural frequencies, damping ratios,
-mode shapes) from input-output tests (EMA) or from output-only measurements (OMA).
+Modal analysis tools in Python, built on JAX: natural frequencies, damping
+ratios and mode shapes from input-output tests (EMA) or output-only
+measurements (OMA).
 
 - **Spectra**: FRFs, coherence and power spectra of input-output tests (`EmaModel`);
   correlations and half spectra of output-only records (`OmaModel`).

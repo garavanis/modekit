@@ -1,5 +1,4 @@
-"""modekit: modal analysis in JAX — modal parameters (natural frequencies, damping
-ratios, mode shapes) from input-output tests or from output-only measurements.
+"""modekit: modal analysis tools in Python, built on JAX.
 
 The main names are available here (``import modekit as mk``); the modules hold
 the rest.

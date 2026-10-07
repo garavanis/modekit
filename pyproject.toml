@@ -1,7 +1,7 @@
 [project]
 name = "modekit"
 version = "0.2.0"
-description = "Modal analysis in JAX: modal parameters from input-output tests or from output-only measurements"
+description = "Modal analysis tools in Python, built on JAX"
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
