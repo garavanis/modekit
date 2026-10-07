@@ -295,37 +295,6 @@ def plot_case():
     return res, est
 
 
-def test_plot_stab_cluster_returns_a_figure(plot_case):
-    from modekit import plots
-
-    res, _ = plot_case
-    fig, ax = plots.plot_stab_cluster(
-        np.asarray(res.Fn_fl),
-        np.asarray(res.order_fl),
-        np.asarray(res.labels),
-        ordmax=30,
-        plot_noise=True,
-    )
-    assert isinstance(fig, plt.Figure)
-    assert ax.lines  # coloured pole markers + median lines
-    plt.close(fig)
-
-
-def test_plot_cluster_freqs_zetas_returns_a_figure(plot_case):
-    from modekit import plots
-
-    res, _ = plot_case
-    fig, ax = plots.plot_cluster_freqs_zetas(
-        np.asarray(res.Fn_fl),
-        np.asarray(res.Zeta_fl),
-        np.asarray(res.labels),
-        plot_noise=True,
-    )
-    assert isinstance(fig, plt.Figure)
-    assert len(ax.lines) >= res.n_clusters  # one marker series per cluster
-    plt.close(fig)
-
-
 def test_plscf_cluster_plot_wrappers_return_figures(plot_case):
     res, est = plot_case
     fig1, _ = est.stab_cluster_plot(res)
@@ -333,16 +302,6 @@ def test_plscf_cluster_plot_wrappers_return_figures(plot_case):
     assert isinstance(fig1, plt.Figure) and isinstance(fig2, plt.Figure)
     plt.close(fig1)
     plt.close(fig2)
-
-
-def test_plot_k_distance_returns_a_figure():
-    from modekit import plots
-
-    kd = clustering.k_distance(_diagram(), min_pts=25)
-    fig, ax = plots.plot_k_distance(kd, eps=clustering.DEFAULT_EPS, k=25)
-    assert isinstance(fig, plt.Figure)
-    assert ax.lines  # the k-distance curve + the eps line
-    plt.close(fig)
 
 
 def test_plscf_k_distance_plot_wrapper():

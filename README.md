@@ -34,18 +34,17 @@ A hammer test: `x` is the force, `(n_reps, 1, nt)`, `y` the accelerations,
 `(n_reps, Q, nt)`, both sampled at `fs` Hz.
 
 ```python
-from modekit.freq_models import EmaModel
-from modekit.bandmpe import full_band_mpe
+import modekit as mk
 
-ema = EmaModel(X=x, Y=y, fs=fs, exc_type="transient")
+ema = mk.EmaModel(X=x, Y=y, fs=fs, exc_type="transient")
 freqs, H = ema.get_frf(method="H1")                       # FRFs, (Q, 1, N)
 
 # one pLSCF per band, at a fake sampling rate about 2.5x the band's upper edge;
 # the bands' modes combined; then one LSFD residue fit over 2-560 Hz
 bands = [(2, 120, 300.0), (120, 320, 800.0), (320, 560, 1400.0)]
 alpha = None                                              # decay rate of the exponential window, if one was applied
-fit, band_data = full_band_mpe([(freqs, H)], alpha, fs, bands, spectrum="frf_tap",
-                               quantity="acceleration", refs="global")
+fit, band_data = mk.full_band_mpe([(freqs, H)], alpha, fs, bands, spectrum="frf_tap",
+                                  quantity="acceleration", refs="global")
 lsfd, model = fit
 model.Fn, model.Zeta                                      # natural frequencies [Hz], damping ratios
 phi = model.mode_shapes(real=True, normalize="l2")        # mode shapes, (Q, M)
@@ -75,6 +74,10 @@ With a LaTeX installation, `modekit.latex` sets all the text in LaTeX.
 
 ## Modules
 
+The names of the quick start, the estimators, the tables and the model
+serialisation are available at the top level (`import modekit as mk`); the
+modules hold everything:
+
 | Module | Contents |
 | --- | --- |
 | `freq_models` | `EmaModel`, `OmaModel`: spectra, FRFs, coherence, correlations |
@@ -85,7 +88,7 @@ With a LaTeX installation, `modekit.latex` sets all the text in LaTeX.
 | `reporting`, `export` | report tables; text, CSV, Excel and HTML output |
 | `plots` | the figures |
 | `serialisation` | saving and loading Equinox models |
-| `dataprep` | tap-test loading, windows, detrending, decimation, filtering |
+| `taptest`, `windows`, `preprocess` | tap-test loading and bad-rep checks; force and exponential windows; detrending, decimation, filtering |
 | `datasets` | the example data download |
 
 ## Tests

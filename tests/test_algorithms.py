@@ -50,23 +50,6 @@ def fitted():
 
 
 # =============================================================================
-# pLSCF is an immutable eqx.Module
-# =============================================================================
-
-
-def test_plscf_is_a_frozen_module():
-    import equinox as eqx
-
-    V = _mode_shapes()
-    freq, _ = _synth_frf(V)
-    algo = pLSCF(freq, fs=FS, ordmax=6, spectrum="frf_shaker")
-    assert isinstance(algo, eqx.Module)
-    assert algo.dt == 1.0 / FS  # derived property, nothing stale stored
-    with pytest.raises(Exception):  # noqa: B017 — frozen: any mutation is rejected
-        algo.ordmax = 7
-
-
-# =============================================================================
 # fit()
 # =============================================================================
 

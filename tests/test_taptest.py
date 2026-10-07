@@ -1,11 +1,11 @@
 """
-Tests for ``modekit.dataprep.taptest``: reading a folder of tap-test CSVs.
+Tests for ``modekit.taptest``: reading a folder of tap-test CSVs.
 """
 
 import numpy as np
 import pytest
 
-from modekit.dataprep import taptest
+from modekit import taptest
 
 # two reps of (Hammer, Acc); the second rep is zero-padded after two samples
 CSV = (
