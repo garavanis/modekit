@@ -1,21 +1,17 @@
 # modekit
 
-Modal parameter estimation in Python, for experimental (EMA) and operational
-(OMA) modal analysis.
+Modal analysis in JAX: natural frequencies, damping ratios and mode shapes
+from tap tests (EMA) or from output-only records (OMA).
 
-- **Measurement models**: FRFs, coherence and power spectra of tap tests
-  (`EmaModel`); correlations and half-spectra of output-only records
-  (`OmaModel`).
-- **Band-wise pLSCF (PolyMAX)**: one fit per frequency band on a fake sampling
-  rate, stabilisation diagrams, stable poles clustered into modes (DBSCAN),
-  modes merged across bands and reference passes.
-- **LSFD**: residue fits at the identified poles, with the participation
-  factors held fixed, for the mode shapes.
-- **Tracking**: local low-order pLSCF models follow known modes over the
-  segments of long records.
-- **Around the fits**: signal preparation and windows, mode matching and
-  catalogues, report tables (CSV, Excel, HTML), figures, and fits cached on
-  disk as Equinox files.
+- **Spectra**: FRFs, coherence and power spectra of tap tests (`EmaModel`);
+  correlations and half spectra of output-only records (`OmaModel`).
+- **Poles**: band-wise pLSCF (PolyMAX) with stabilisation diagrams; the stable
+  poles are clustered into modes and merged across bands and reference sets.
+- **Mode shapes**: an LSFD residue fit at the identified poles.
+- **Tracking**: small local pLSCF models follow known modes through the
+  segments of a long record.
+- **Also**: windows and preprocessing, mode matching and catalogues, tables
+  (CSV, Excel, HTML), figures, and fits saved to disk.
 
 Built on [JAX](https://github.com/jax-ml/jax) and
 [Equinox](https://github.com/patrick-kidger/equinox). Importing `modekit`
