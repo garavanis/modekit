@@ -947,14 +947,15 @@ def plot_stab_cluster(
     ax.tick_params(which="both", direction="in", top=True)
     ax_pole.tick_params(which="both", direction="in")
 
-    ax_pole.legend(
-        loc="center left",
-        bbox_to_anchor=(1.06 if overlay else 1.02, 0.5),
-        frameon=False,
-        markerscale=1.5,
-        ncol=1 if len(colors) <= 14 else 2,
-        title="Clusters",
-    )
+    if ax_pole.get_legend_handles_labels()[1]:  # a band without clusters has nothing to list
+        ax_pole.legend(
+            loc="center left",
+            bbox_to_anchor=(1.06 if overlay else 1.02, 0.5),
+            frameon=False,
+            markerscale=1.5,
+            ncol=1 if len(colors) <= 14 else 2,
+            title="Clusters",
+        )
     plt.tight_layout()
 
     if save_fig_name:
@@ -1075,14 +1076,15 @@ def plot_cluster_freqs_zetas(
     ax.yaxis.set_minor_locator(AutoMinorLocator())
     ax.tick_params(which="both", direction="in", top=True, right=True)
 
-    ax.legend(
-        loc="center left",
-        bbox_to_anchor=(1.02, 0.5),
-        frameon=False,
-        markerscale=1.5,
-        ncol=1 if len(colors) <= 14 else 2,
-        title="Clusters",
-    )
+    if ax.get_legend_handles_labels()[1]:  # a band without clusters has nothing to list
+        ax.legend(
+            loc="center left",
+            bbox_to_anchor=(1.02, 0.5),
+            frameon=False,
+            markerscale=1.5,
+            ncol=1 if len(colors) <= 14 else 2,
+            title="Clusters",
+        )
     plt.tight_layout()
 
     if save_fig_name:
