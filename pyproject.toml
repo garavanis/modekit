@@ -1,7 +1,7 @@
 [project]
 name = "modekit"
 version = "0.1.0"
-description = "Modal parameter estimation for experimental and operational modal analysis: band-wise pLSCF, LSFD, stabilisation clustering and mode tracking."
+description = "Modal analysis in JAX: natural frequencies, damping and mode shapes from tap tests or ambient vibrations"
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]
