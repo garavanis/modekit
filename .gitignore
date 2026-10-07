@@ -16,3 +16,6 @@ examples/figures/
 
 # Jupyter
 .ipynb_checkpoints/
+
+# local papers and notes, not part of the repository
+docs/
