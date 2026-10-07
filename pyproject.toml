@@ -1,7 +1,7 @@
 [project]
 name = "modekit"
 version = "0.2.0"
-description = "Modal analysis in JAX: natural frequencies, damping and mode shapes from hammer or shaker tests, or from ambient vibrations"
+description = "Modal analysis in JAX: modal parameters from input-output tests or from output-only measurements"
 readme = "README.md"
 license = "MIT"
 license-files = ["LICENSE"]

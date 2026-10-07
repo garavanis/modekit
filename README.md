@@ -1,9 +1,9 @@
 # modekit
 
-Modal analysis in JAX: natural frequencies, damping ratios and mode shapes
-from hammer or shaker tests (EMA) or from output-only records (OMA).
+Modal analysis in JAX: modal parameters (natural frequencies, damping ratios,
+mode shapes) from input-output tests (EMA) or from output-only measurements (OMA).
 
-- **Spectra**: FRFs, coherence and power spectra of hammer or shaker tests (`EmaModel`);
+- **Spectra**: FRFs, coherence and power spectra of input-output tests (`EmaModel`);
   correlations and half spectra of output-only records (`OmaModel`).
 - **Poles**: band-wise pLSCF (PolyMAX) with stabilisation diagrams; the stable
   poles are clustered into modes and merged across bands and reference sets.
