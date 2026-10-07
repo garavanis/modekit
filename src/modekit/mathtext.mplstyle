@@ -1,0 +1,6 @@
+# modekit's figure style without LaTeX: the maths in Computer Modern through
+# matplotlib's own mathtext, the text in matplotlib's default font. Nothing to
+# install. A notebook applies it with
+#     plt.style.use("modekit.mathtext")
+# With a LaTeX installation, modekit.latex sets all the text in LaTeX instead.
+mathtext.fontset : cm

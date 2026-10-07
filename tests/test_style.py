@@ -22,6 +22,16 @@ def test_the_style_sheet_turns_on_latex_text():
     assert matplotlib.rcParams["text.usetex"] is False  # the context put it back
 
 
+def test_the_mathtext_style_needs_no_latex():
+    with plt.style.context("modekit.mathtext"):
+        assert matplotlib.rcParams["mathtext.fontset"] == "cm"
+        assert matplotlib.rcParams["text.usetex"] is False
+        fig, ax = plt.subplots()
+        ax.set_xlabel(r"$f_{n,1}$ [Hz]")
+        fig.canvas.draw()  # renders the maths with matplotlib's own fonts
+        plt.close(fig)
+
+
 def test_imports_leave_matplotlib_alone():
     """Importing the figure modules sets no LaTeX or font: a notebook opts in with
     plt.style.use("modekit.latex"). Run in a fresh interpreter, unaffected by this one."""
