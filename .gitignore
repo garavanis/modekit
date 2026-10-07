@@ -19,3 +19,6 @@ examples/figures/
 
 # local papers and notes, not part of the repository
 docs/
+
+# Claude Code project files (local)
+.claude/
