@@ -32,6 +32,42 @@ pip install git+https://github.com/garavanis/modekit
 `export.save_table(..., fmt="excel")` also needs `openpyxl`: install
 `modekit[excel]`.
 
+## Quick start
+
+A hammer test: `x` is the force, `(n_reps, 1, nt)`, `y` the accelerations,
+`(n_reps, Q, nt)`, both sampled at `fs` Hz.
+
+```python
+from modekit.freq_models import EmaModel
+from modekit.bandmpe import full_band_mpe
+
+ema = EmaModel(X=x, Y=y, fs=fs, exc_type="transient")
+freqs, H = ema.get_frf(method="H1")                       # FRFs, (Q, 1, N)
+
+# one pLSCF per band, at a fake sampling rate about 2.5x the band's upper edge;
+# the bands' modes combined; then one LSFD residue fit over 2-560 Hz
+bands = [(2, 120, 300.0), (120, 320, 800.0), (320, 560, 1400.0)]
+fit, band_data = full_band_mpe([(freqs, H)], None, fs, bands, spectrum="frf_tap",
+                               quantity="acceleration", refs="global")
+lsfd, model = fit
+model.Fn, model.Zeta                                      # natural frequencies [Hz], damping ratios
+phi = model.mode_shapes(real=True, normalize="l2")        # mode shapes, (Q, M)
+
+# diagnostics: a stabilisation chart per band, and the synthesis against the data
+for flo, fhi, est, poles, res in band_data[0]:
+    est.stab_plot(poles, data=H[:, :, (freqs >= flo) & (freqs <= fhi)], indicator="cmif", xlim=(flo, fhi))
+lsfd.synthesis_plot(model, H, xlim=lsfd.band)
+```
+
+The third argument of `full_band_mpe` is the decay rate of an exponential
+window on the responses (`None`: no window). Output-only data goes the same
+way: `OmaModel(y, fs, fft_args={"n_lags": 4096}, estimator="cor")`, its half
+spectra from `get_output_spectra(ref_dofs=[0])`, and
+`full_band_mpe(..., oma.window_rate, fs, bands, spectrum="sd_cor")`. With
+several reference passes, `refs="local"` re-estimates the participation
+factors on the combined spectra. The example notebook walks through both,
+with the windows, the data checks and the clustering settings.
+
 ## Example
 
 `examples/garteur.ipynb` walks through tap tests on the GARTEUR structure:
