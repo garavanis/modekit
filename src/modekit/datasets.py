@@ -11,9 +11,9 @@ from pathlib import Path
 from typing import Iterable, Optional
 from urllib.request import urlretrieve
 
-# raw files of the modekit-data repository (HEAD: its default branch); point it
-# elsewhere for a mirror
-DATA_URL = "https://raw.githubusercontent.com/garavanis/modekit-data/HEAD"
+# raw files of the modekit-data repository, branch main; point it elsewhere for
+# a mirror
+DATA_URL = "https://raw.githubusercontent.com/garavanis/modekit-data/main"
 
 
 def fetch(folder: str, files: Iterable[str], cache_dir, url: Optional[str] = None) -> Path:
