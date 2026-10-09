@@ -135,3 +135,26 @@ def test_save_fig_name_is_a_path_and_its_folder_is_created(tmp_path, monkeypatch
     fig, _ = plots.plot_mode_complexity(np.array([1.0, 0.5j]), save_fig_name="figs/c.png")
     plt.close(fig)
     assert (tmp_path / "figs" / "c.png").exists()
+
+
+def test_plot_samples_labels_one_per_feature():
+    x = [20.0, 30.0]
+    samples = np.random.default_rng(0).normal(10.0, 1.0, size=(8, 3, 2))
+    samples[:, 1, 0] = np.nan  # a feature missing at one point is still labelled once
+    fig, ax = plots.plot_samples(x, samples, labels=["r1", "r4", "r7"])
+    assert [t.get_text() for t in ax.get_legend().get_texts()] == ["r1", "r4", "r7"]
+    plt.close(fig)
+    fig, ax = plots.plot_samples(x, samples)  # no labels: no legend, no axis labels
+    assert ax.get_legend() is None and ax.get_xlabel() == "" and ax.get_ylabel() == ""
+    plt.close(fig)
+    with pytest.raises(ValueError, match="labels"):
+        plots.plot_samples(x, samples, labels=["r1"])
+
+
+def test_plot_pdfs_labels_one_panel_per_feature():
+    samples = np.random.default_rng(0).normal(size=(30, 2))
+    fig, axes = plots.plot_pdfs(samples, y_labels=["row 4", "row 7"])
+    assert [ax.get_ylabel() for ax in axes] == ["row 4", "row 7"]
+    plt.close(fig)
+    with pytest.raises(ValueError, match="y_labels"):
+        plots.plot_pdfs(samples, y_labels=["only one"])

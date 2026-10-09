@@ -15,9 +15,12 @@ from pathlib import Path
 
 import matplotlib.pyplot as plt
 import numpy as np
-from matplotlib.colors import ListedColormap
+from matplotlib.colors import ListedColormap, to_rgba
+from matplotlib.lines import Line2D
+from matplotlib.patches import Patch
 from matplotlib.ticker import AutoMinorLocator, MaxNLocator
 from scipy.linalg import eigh
+from scipy.stats import gaussian_kde
 
 from modekit import criteria
 
@@ -357,6 +360,282 @@ def plot_signal_ci(
             plt.tight_layout(rect=[0, 0, 1, 1 - h - 0.01])
         else:
             plt.tight_layout()
+
+    if save_fig_name:
+        save_path = Path(save_fig_name)
+        save_path.parent.mkdir(parents=True, exist_ok=True)
+        plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+    return fig, axes
+
+
+def plot_samples(
+    x,
+    samples,
+    labels=None,
+    x_label=None,
+    y_label=None,
+    yscale="linear",
+    cmap_name="tab20",
+    cmap_span=(0.0, 1.0),
+    jitter=0.8,
+    marker_size=2.5,
+    alpha=0.6,
+    figsize=None,
+    xlim=None,
+    save_fig_name=None,
+):
+    """
+    Sampled features against an operating parameter, one colour per feature.
+
+    One dot per finite ``(sample, feature)`` value, placed at its operating
+    point (e.g. a wind speed). The samples at each point are jittered
+    horizontally so their scatter is visible.
+
+    Parameters
+    ----------
+    x : array_like, shape (n_points,)
+        Operating points; they set the x positions and the x ticks.
+    samples : sequence of ndarray or ndarray
+        One ``(n_samples, M)`` array per operating point, in the order of
+        ``x``, one column per feature; or a single ``(n_samples, M, n_points)``
+        array. Non-finite values are skipped.
+    labels : sequence of str, optional
+        Legend entry of each feature, one per column. Default None: no legend.
+    x_label, y_label : str, optional
+        Axis labels. Default None: no labels.
+    yscale : str, optional
+        Matplotlib y-axis scale. Default ``"linear"``.
+    cmap_name : str or Colormap, optional
+        Colormap keying the features. Default ``"tab20"``.
+    cmap_span : (float, float), optional
+        Sub-range of ``[0, 1]`` over which a continuous colormap is sampled.
+    jitter : float, optional
+        Half-width [x-units] of the horizontal spread of each point's samples.
+        Default 0.8.
+    marker_size : float, optional
+        Marker size of the sample dots. Default 2.5.
+    alpha : float, optional
+        Opacity of the sample dots. Default 0.6.
+    figsize : tuple, optional
+        Figure size. Defaults to ``(10, 6)``.
+    xlim : tuple(float, float), optional
+        x-axis limits. Default None (autoscale around the operating points).
+    save_fig_name : str, optional
+        If given, the figure is saved to this path.
+
+    Returns
+    -------
+    fig : matplotlib.figure.Figure
+    ax : matplotlib.axes.Axes
+    """
+    x = np.asarray(x, dtype=float).ravel()
+    if getattr(samples, "ndim", None) == 3:  # (n_samples, M, n_points), NaN-padded
+        stack = np.asarray(samples, dtype=float)
+        arrays = [stack[:, :, j] for j in range(stack.shape[2])]
+    else:
+        arrays = [np.asarray(a, dtype=float) for a in samples]
+    if x.size == 0:
+        raise ValueError("x is empty — nothing to plot.")
+    if len(arrays) != x.size:
+        raise ValueError(
+            f"samples has {len(arrays)} entries but x has {x.size} operating points."
+        )
+    M = arrays[0].shape[1] if arrays[0].ndim == 2 else -1
+    if any(a.ndim != 2 or a.shape[1] != M for a in arrays):
+        raise ValueError(
+            "every samples array must be 2-D with the same number of features."
+        )
+    if labels is not None and len(labels) != M:
+        raise ValueError(f"labels has {len(labels)} entries for {M} features.")
+
+    if figsize is None:
+        figsize = (10, 6)
+    fig, ax = plt.subplots(figsize=figsize)
+
+    cmap = plt.get_cmap(cmap_name)
+    if isinstance(cmap, ListedColormap) and cmap.N <= 20:
+        colors = [cmap(k % cmap.N) for k in range(M)]  # one hue per feature, wrapping
+    else:
+        colors = _series_colors(cmap, M, span=cmap_span)  # sampled in feature order
+
+    for k, color in enumerate(colors):
+        label = None if labels is None else labels[k]
+        drawn = False  # label the feature once, on its first populated point
+        for xp, arr in zip(x, arrays):
+            col = arr[:, k]
+            m = np.isfinite(col)
+            if not m.any():
+                continue
+            # spread the point's samples across [-jitter, jitter] about xp
+            xs = xp + np.linspace(-jitter, jitter, col.size)
+            ax.plot(
+                xs[m],
+                col[m],
+                ".",
+                markersize=marker_size,
+                color=color,
+                alpha=alpha,
+                label=None if drawn else label,
+            )
+            drawn = True
+
+    ax.set_yscale(yscale)
+    if x_label is not None:
+        ax.set_xlabel(x_label)
+    if y_label is not None:
+        ax.set_ylabel(y_label)
+    ax.set_xticks(x)
+    if xlim is not None:
+        ax.set_xlim(xlim[0], xlim[1])
+    ax.xaxis.set_minor_locator(AutoMinorLocator())
+    if yscale == "linear":
+        ax.yaxis.set_minor_locator(AutoMinorLocator())
+    ax.tick_params(which="both", direction="in", top=True, right=True)
+
+    if labels is not None:
+        leg = ax.legend(
+            loc="center left",
+            bbox_to_anchor=(1.02, 0.5),
+            frameon=False,
+            markerscale=1.5,
+            fontsize=9,
+            ncol=1,
+        )
+        # keep the legend swatches crisp
+        for handle in getattr(leg, "legend_handles", getattr(leg, "legendHandles", [])):
+            handle.set_alpha(1.0)
+    plt.tight_layout()
+
+    if save_fig_name:
+        save_path = Path(save_fig_name)
+        save_path.parent.mkdir(parents=True, exist_ok=True)
+        plt.savefig(save_path, dpi=300, bbox_inches="tight")
+
+    return fig, ax
+
+
+def plot_pdfs(
+    samples,
+    cmap_name="Dark2",
+    cmap_span=(0.0, 1.0),
+    bw_adjust=1.0,
+    fill_alpha=0.4,
+    x_label=None,
+    y_labels=None,
+    simple_legend=False,
+    figsize=None,
+    save_fig_name=None,
+):
+    """
+    Densities of sampled features on stacked subplots, one subplot per feature.
+
+    Parameters
+    ----------
+    samples : array or dict
+        Either a single ``(n_samples, M)`` array, one column per feature, or a
+        mapping ``{label: (n_samples, M) array}``.
+    cmap_name : str or Colormap, optional
+        Colormap name (or a ``Colormap`` object) to colour the series. Default
+        is 'Dark2'.
+    cmap_span : (float, float), optional
+        Sub-range of ``[0, 1]`` over which a continuous colormap is sampled.
+    bw_adjust : float, optional
+        Multiplier on the kernel bandwidth of Scott's rule. Default 1.0.
+    fill_alpha : float, optional
+        Opacity of the filled area under each density. Default 0.4.
+    x_label : str, optional
+        Label for the (bottom) x-axis. Default None: no label.
+    y_labels : sequence of str, optional
+        Y-axis label of each feature's subplot, one per feature (column of
+        ``samples``). Default None: no labels.
+    simple_legend : bool, optional
+        If True, the legend carries one entry per series; otherwise a density
+        and a mean entry per series. Default False.
+    figsize : tuple, optional
+        Figure size. Defaults to ``(10, 2 * M)``.
+    save_fig_name : str, optional
+        If provided, the figure will be saved with this name.
+
+    Returns
+    -------
+    fig : matplotlib.figure.Figure
+    axes : numpy.ndarray of matplotlib.axes.Axes
+    """
+
+    series = samples if isinstance(samples, dict) else {None: samples}
+    arrays = {k: np.asarray(v, dtype=float) for k, v in series.items()}
+    if any(a.ndim != 2 for a in arrays.values()):
+        raise ValueError("every samples array must be 2-D (n_samples, M).")
+    M = next(iter(arrays.values())).shape[1]
+    if any(a.shape[1] != M for a in arrays.values()):
+        raise ValueError("every series must carry the same number of features M.")
+    if y_labels is not None and len(y_labels) != M:
+        raise ValueError(f"y_labels has {len(y_labels)} entries for {M} features.")
+
+    if figsize is None:
+        figsize = (10, 2 * M)
+
+    cmap = plt.get_cmap(cmap_name)
+    n_series = len(series)
+    colors = _series_colors(cmap, n_series, span=cmap_span)
+
+    def density(values):
+        kde = gaussian_kde(values)
+        kde.set_bandwidth(kde.factor * bw_adjust)
+        bw = np.sqrt(kde.covariance[0, 0])
+        grid = np.linspace(values.min() - 3 * bw, values.max() + 3 * bw, 200)
+        return grid, kde(grid)
+
+    fig, axes = plt.subplots(M, 1, figsize=figsize, sharex=False, squeeze=False)
+    axes = axes.ravel()
+
+    for k in range(M):
+        for s, arr in enumerate(arrays.values()):
+            col = arr[:, k]
+            values = col[np.isfinite(col)]
+            if np.unique(values).size < 2:
+                continue  # a density needs at least two distinct samples
+            grid, pdf = density(values)
+            axes[k].fill_between(
+                grid, 0.0, pdf, color=colors[s], alpha=fill_alpha, linewidth=0.0
+            )
+            axes[k].plot(grid, pdf, color=colors[s], linewidth=1.5)
+            axes[k].axvline(
+                values.mean(), color=colors[s], linestyle="dashdot", linewidth=1.5
+            )
+        axes[k].set_ylim(bottom=0.0)
+        if y_labels is not None:
+            axes[k].set_ylabel(y_labels[k])
+        axes[k].xaxis.set_minor_locator(AutoMinorLocator())
+        axes[k].yaxis.set_minor_locator(AutoMinorLocator())
+        axes[k].tick_params(which="both", direction="in", top=True, right=True)
+        axes[k].grid(True, linestyle="--", alpha=0.7)
+
+    if x_label is not None:
+        axes[-1].set_xlabel(x_label)
+
+    handles, labels = [], []
+    for s, label in enumerate(series):
+        swatch = Patch(
+            facecolor=to_rgba(colors[s], fill_alpha), edgecolor=colors[s], linewidth=1.5
+        )
+        if simple_legend:
+            if label is not None:
+                handles.append(swatch)
+                labels.append(str(label))
+        else:
+            prefix = "" if label is None else f"{label}: "
+            handles += [
+                swatch,
+                Line2D([], [], color=colors[s], linestyle="dashdot", linewidth=1.5),
+            ]
+            labels += [f"{prefix}pdf", f"{prefix}mean"]
+    if handles:
+        h = _legend_above(fig, handles, labels, group=1 if simple_legend else 2)
+        plt.tight_layout(rect=[0, 0, 1, 1 - h - 0.01])
+    else:
+        plt.tight_layout()
 
     if save_fig_name:
         save_path = Path(save_fig_name)
