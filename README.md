@@ -70,8 +70,8 @@ measurements it needs (about 450 MB) from
 `examples/data/`; tables and figures go to `examples/outputs/` and
 `examples/figures/`.
 
-The figures use `plt.style.use("modekit.mathtext")`, which needs no LaTeX.
-With a LaTeX installation, `modekit.latex` sets all the text in LaTeX.
+The figures use `plt.style.use("modekit.latex")`, which sets all the text in
+LaTeX and needs a LaTeX installation; without one, switch to `modekit.mathtext`.
 
 ## Modules
 
