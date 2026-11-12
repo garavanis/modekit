@@ -1,7 +1,7 @@
 """
 Figures of modal tests and their identification.
 
-Measured signals and signal ensembles with their confidence bands,
+Measured signals and signal ensembles with their central intervals,
 stabilisation charts and their clusters, mode-indicator functions,
 frequency-damping and k-distance charts, measured spectra against a fitted
 model's synthesis, MAC matrices, mode complexity and 3D mode-shape wireframes.
@@ -213,8 +213,8 @@ def plot_signal_ci(
     Plot ensemble signals on stacked subplots, one subplot per channel.
 
     Each series is rendered as (i) up to ``max_samples`` thin realizations in
-    the background, (ii) the central ``ci`` empirical credible interval as a
-    shaded band, and (iii) the ensemble mean on top.
+    the background, (ii) the central interval (CI) of the ensemble as a shaded
+    band, and (iii) the ensemble mean on top.
 
     Parameters
     ----------
@@ -242,8 +242,9 @@ def plot_signal_ci(
         Y-axis label of each channel's subplot, one per channel (second axis
         of ``signal``). Default None: no labels.
     ci : float, optional
-        Central probability mass in [0, 1] for the empirical credible band.
-        Defaults to 0.95.
+        Probability mass in [0, 1] of the central interval: the band runs
+        between the ``(1 - ci) / 2`` and ``(1 + ci) / 2`` quantiles of the
+        ensemble at each ``x``. Defaults to 0.95.
     max_samples : int, optional
         Maximum number of individual realizations to overlay per series.
     linestyle : str, optional
@@ -301,7 +302,9 @@ def plot_signal_ci(
             q_hi = 100.0 - q_lo
             lo = np.nanpercentile(ens, q_lo, axis=0)
             hi = np.nanpercentile(ens, q_hi, axis=0)
-            band_label = rf"{ci * 100:g}\% CI"
+            # LaTeX text needs the percent sign escaped, plain text shows the backslash
+            pct = r"\%" if plt.rcParams["text.usetex"] else "%"
+            band_label = f"{ci * 100:g}{pct} CI"
 
             n_show = min(max_samples, ens.shape[0])
             for i in range(n_show):

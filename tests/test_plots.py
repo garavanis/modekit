@@ -72,6 +72,7 @@ def test_plot_signal_ci_labels_one_panel_per_live_channel():
     signal[:, 1] = 0.0  # a silent channel: no panel, and its label goes with it
     fig, axes = plots.plot_signal_ci(x, signal, y_labels=["a", "b", "c"])
     assert [ax.get_ylabel() for ax in axes] == ["a", "c"]
+    assert [t.get_text() for t in fig.legends[0].get_texts()] == ["95% CI", "mean"]  # no backslash in plain text
     plt.close(fig)
     fig, axes = plots.plot_signal_ci(x, signal)  # no labels by default
     assert [ax.get_ylabel() for ax in axes] == ["", ""]
